@@ -1,10 +1,17 @@
-﻿class SayaTubeVideo {
+﻿using System.Diagnostics;
+using System.Diagnostics.Contracts;
+
+class SayaTubeVideo {
     private int id;
     private string title;
     private int playCount;
     
     public SayaTubeVideo( string title)
     {
+        
+        Debug.Assert(title.Length <= 100, "judul video maksimal 100 karakter") ;
+        Debug.Assert(title != null, "judul tidak boleh kosong");
+
         Random rand = new Random();
         this.id = rand.Next(10000, 99999);
         this.title = title;
@@ -12,11 +19,22 @@
     }
     public void IncreasePlayCount(int count)
     {
-        if (count < 0)
+        try
         {
-            Console.WriteLine("jumlah tidak boleh negatif");
+            if (count <= 0 || count > 10000000)
+            {
+                throw new ArgumentException("Error: Input play count harus antara 1 hingga 10.000.000.");
+            }
+
+            checked
+            {
+                this.playCount += count;
+            }
         }
-        this.playCount += count;
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
     public void PrintVideoDetails()
     {
@@ -29,8 +47,12 @@ class Program
 {
     static void Main()
     {
-        SayaTubeVideo video1 = new SayaTubeVideo("Tutorial Design by Contract - Fadhli Muhammad Dzaki");
-        video1.IncreasePlayCount(10);
-        video1.PrintVideoDetails();
+        SayaTubeVideo video = new SayaTubeVideo("Tutorial Design By Contract - Fadhli Muhammad Dzaki");
+        video.IncreasePlayCount(5000000);
+        video.IncreasePlayCount(10000000);
+        video.IncreasePlayCount(-100);
+        video.IncreasePlayCount(15000000);
+        video.PrintVideoDetails();
     }
+
 }
